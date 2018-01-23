@@ -1,5 +1,6 @@
-USE `cs122b`;
+Create database moviedb;
 
+USE `moviedb`;
 CREATE TABLE IF NOT EXISTS MOVIES 
 (
 	id varchar(10) NOT NULL DEFAULT '',
