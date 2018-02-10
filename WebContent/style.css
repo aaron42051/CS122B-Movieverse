@@ -1,0 +1,96 @@
+html {
+  font-family: Roboto, sans-serif;
+}
+
+/* LOGIN PAGE */
+
+form {
+  width: 30%;
+  margin: 10% auto;
+}
+
+/* WELCOME PAGE */
+
+.btn-div {
+  margin: 3% auto;
+  width: 14%;
+}
+
+.title-div {
+  text-align: center;
+  margin: 10% auto auto auto;
+  width: max-content;
+}
+
+.welcome {
+  font-size: 9vh;
+}
+
+/* SEARCH PAGE */
+.search-title {
+  font-size: 7vh;
+  margin-top: 2%;
+  text-align: center;
+}
+
+.search-div {
+  margin: 5% auto auto auto;
+  width: 35%;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.bar-div {
+  width: 70%;
+  margin: auto auto auto 5%;
+}
+
+#movie-title {
+  font-size: 30px;
+}
+
+#movie-year {
+  font-size: 30px;
+}
+
+#movie-director {
+  font-size: 30px;
+}
+
+#movie-stars {
+  font-size: 30px;
+}
+
+.genres {
+  margin-top: 5%;
+}
+
+.search_button_div {
+  margin: 10% auto auto auto;
+  width: 19%;
+}
+
+
+/* TOP 20 MOVIES */
+
+.main-title {
+  text-align: center;
+  font-size: 6vh;
+}
+
+.movie-div {
+  border: 5px solid #2D719C;
+  border-radius: 10px;
+  width: 35%;
+  margin: 3% auto auto 3%;
+}
+
+.movie-info {
+  display: inline-block;
+}
+
+.movie-title {
+font-size: 4vh;
+}

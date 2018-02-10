@@ -7,35 +7,36 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
-import java.util.List;
-import java.io.FileWriter;
+//import java.util.List;
+//import java.io.FileWriter;
 
 
+//
+//import org.jdom2.input.SAXBuilder;
+//
+//import org.jdom2.output.XMLOutputter;
+//import org.jdom2.Document;
+//import org.jdom2.Element;
+//import org.jdom2.JDOMException;
 
-import org.jdom2.input.JDOMParseException;
-import org.jdom2.input.SAXBuilder;
-
-import org.jdom2.output.XMLOutputter;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
+import java.io.PrintWriter;
 
 
 @WebServlet("/MovieList")
 public class MovieList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private static List allChildren;
-	private static Element html;
-	private static Element body;
-	private static Document doc;
-	private static SAXBuilder builder = new SAXBuilder();
+//	private static List<Element> allChildren;
+//	private static Element body;
+//	private static Document doc;
+//	private static SAXBuilder builder = new SAXBuilder();
     public MovieList() throws IOException {
         super();
 
 
     }
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+        PrintWriter out = response.getWriter();
+        out.println("Hello!");
 	}
 
 
@@ -43,33 +44,33 @@ public class MovieList extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	protected static void setupJDOM(String path) throws IOException, JDOMException {
+	protected static void setupJDOM(String path) throws IOException {
 
         //--------------JDOM HTML EDITING----------------------------------------------------
-        builder = new SAXBuilder();
-        doc = builder.build(path);
+//        builder = new SAXBuilder();
+//        doc = builder.build(path);
 
 
        
-        Element webapp = doc.getRootElement();
-        allChildren = webapp.getChildren();
-        System.out.println("First kid: " + ((Element)allChildren.get(0)).getName());
-        body = ((Element)allChildren.get(1));
+//        Element webapp = doc.getRootElement();
+//        allChildren = webapp.getChildren();
+//        System.out.println("First kid: " + ((Element)allChildren.get(0)).getName());
+//        body = ((Element)allChildren.get(1));
        // body.setContent(new Element(null));
 	}
 	
 	protected static void addMovie(String title, int year, String director, String genres, String stars, double rating, int rank) {
-		Element div = new Element("div").setAttribute("class", "movie-div");
-		Element _title = new Element("h2").setAttribute("class", "movie-title").setText(Integer.toString(rank) + ". " + title);
-		Element _year = new Element("h3").setAttribute("class", "movie-info").setText(" " + Integer.toString(year));
-		Element _director = new Element("h3").setAttribute("class", "movie-info").setText("Directed by " + director);
-		Element _genres = new Element ("h3").setAttribute("class", "movie-genres").setText(genres);
-		Element _stars = new Element("h3").setAttribute("class", "movie-stars").setText("Starring: " + stars);
-		Element _rating = new Element("h3").setAttribute("class", "movie-rating").setText("Rating: " + Double.toString(rating));
+//		Element div = new Element("div").setAttribute("class", "movie-div");
+//		Element _title = new Element("h2").setAttribute("class", "movie-title").setText(Integer.toString(rank) + ". " + title);
+//		Element _year = new Element("h3").setAttribute("class", "movie-info").setText(" " + Integer.toString(year));
+//		Element _director = new Element("h3").setAttribute("class", "movie-info").setText("Directed by " + director);
+//		Element _genres = new Element ("h3").setAttribute("class", "movie-genres").setText(genres);
+//		Element _stars = new Element("h3").setAttribute("class", "movie-stars").setText("Starring: " + stars);
+//		Element _rating = new Element("h3").setAttribute("class", "movie-rating").setText("Rating: " + Double.toString(rating));
 		
-
-		div.addContent(_title).addContent(_rating).addContent(_director).addContent(_year).addContent(_genres).addContent(_stars);
-		body.addContent(div);
+//
+//		div.addContent(_title).addContent(_rating).addContent(_director).addContent(_year).addContent(_genres).addContent(_stars);
+//		body.addContent(div);
 
 	}
 	public static void main(String[] args) throws Exception{
@@ -124,7 +125,7 @@ public class MovieList extends HttpServlet {
               	
               	// GET THE STARS OF THIS MOVIE -----------------------------------------------
         		Statement starStatement = connection.createStatement();
-              	ResultSet starSet = genreStatement.executeQuery("SELECT s.name\r\n" + 
+              	ResultSet starSet = starStatement.executeQuery("SELECT s.name\r\n" + 
               			"FROM stars s, movies m, stars_in_movies sm\r\n" + 
               			"WHERE m.id = sm.movieId AND s.id = sm.starId AND m.id = \""+ 
               			result.getString(1) +"\";");
@@ -139,8 +140,8 @@ public class MovieList extends HttpServlet {
               	addMovie(result.getString(2), result.getInt(3), result.getString(4), genres, stars, result.getDouble(5), rank);
               	rank += 1;
         }
-        XMLOutputter fmt = new XMLOutputter();
-        fmt.output(doc, new FileWriter("WebContent/index.html"));
+//        XMLOutputter fmt = new XMLOutputter();
+//        fmt.output(doc, new FileWriter("WebContent/index.html"));
 	}
 
 
