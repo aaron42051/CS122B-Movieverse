@@ -11,6 +11,14 @@ function submitLoginForm(formSubmitEvent) {
   postRequest("LoginServlet", $("#login_form"), loginSuccess);
 }
 
+function submitBrowseForm(formSubmitEvent) {
+	console.log("browse movies");
+	
+	formSubmitEvent.preventDefault();
+	
+	postRequest("BrowseServlet", $("#login_form"), browseSuccess);
+}
+
 function postRequest (servlet, form, successFunction) {
 	console.log("POSTING: " + servlet);
 	jQuery.post(
@@ -59,7 +67,7 @@ function loginSuccess(data) {
    }
     
     setupSearchPage();
-    
+    setupBrowsePage();
 
 }
 
@@ -103,29 +111,36 @@ function searchSuccess(data) {
 		
 		genreList = result[id]["genres"];
 		var buildGenre = "Genres: ";
+
 		length = Object.keys(genreList).length;
 		index = 1;
 		for (key in genreList) {
-			buildGenre += genreList[key];
+			buildGenre = genreList[key];
 			if(index != length) {
 				buildGenre += ", ";
 			}
 			index++;
 		}
 		movieGenres = $("<h3>", {class: "movie-genres", text: buildGenre});
+
+		
+		
+		
 		
 		starList = result[id]["stars"];
 		var buildStars = "Starring: ";
+		movieStars = $("<h4>", {class: "movie-stars", text: buildStars});
+		
 		length = Object.keys(starList).length;
 		index = 1;
 		for (star in starList) {
-			buildStars += starList[star];
+			var span = starList[star];
 			if(index != length) {
-				buildStars += ", ";
+				span2 = span + ", ";
 			}
 			index++;
+			movieStars.append( $("<span>", {style:"color: blue", text:span2, onclick: "star_page(\"" + span + "\")" }) );
 		}
-		movieStars = $("<h4>", {class: "movie-stars", text: buildStars});
 		movieID = $("<h4>", {text: "id: " + id});
 		
 		movieDiv.append(movieTitle).append(movieDirector).append(movieYear).append(movieGenres).append(movieStars).append(movieID);
@@ -137,7 +152,7 @@ function searchSuccess(data) {
 
 }
 
-function setupSearchPage(data) {
+function setupSearchPage() {
 	$("#search-movies").click(function() {
 
   	  console.log("choose Search option");
@@ -165,6 +180,42 @@ function setupSearchPage(data) {
   	  $("#search-form").submit((event) => submitSearch(event));
 
   	});
+}
+
+function setupBrowsePage() {
+	$("#browse-movies").click(function() {
+		console.log("BROWSE");
+		jQuery.post("BrowseServlet", browseSuccess);
+	});
+}
+
+function browseSuccess(data) {
+	console.log("data: " + data);
+	var result = JSON.parse(data);
+	console.log("result dictionary: " + result);
+	$("body").empty();
+		
+	browse_title = $("<h1>", {class:"search-title", text: "Browse the Movieverse"});
+	genre_div = $("<div>", {class:"genre_div"});
+	for (key in result) {
+		genre_div.append($("<button>", {class: "btn btn-primary genre-btn", text: result[key]}));
+	}
+	
+	$("body").append(browse_title).append(genre_div);
+	
+	  	 
+	alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+	title_div = $("<div>", {class:"genre_div"});
+	for (letter in alphabet) {
+		title_div.append($("<button>", {class: "btn btn-primary genre-btn", text: letter}));
+	}
+	
+}
+
+
+function star_page(star) {
+	$("body").empty();
+	
 }
 
 

@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
 		   // AWS VERSION
-//	       Connection connection = DriverManager.getConnection("jdbc:mysql://18.220.104.176:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
+//	       Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 	        
 			// LOCAL VERSION
 			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");

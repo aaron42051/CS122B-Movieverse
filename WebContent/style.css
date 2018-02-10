@@ -93,4 +93,18 @@ form {
 
 .movie-title {
 font-size: 4vh;
+color: blue;
+}
+
+span {
+	color: blue;
+}
+
+
+/* BROWSE PAGE */
+
+.genre_div {
+	margin: 5% auto;
+	width: 70%;
+	text-align: center;
 }

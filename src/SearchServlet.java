@@ -66,6 +66,7 @@ public class SearchServlet extends HttpServlet {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
 			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 
             Statement statement = connection.createStatement();
             

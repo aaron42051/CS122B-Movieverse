@@ -9,8 +9,4 @@
     <servlet-name>MovieList</servlet-name>
     <url-pattern>/servlet/MovieList</url-pattern>
   </servlet-mapping>
-  
-
-
-
 </web-app>
