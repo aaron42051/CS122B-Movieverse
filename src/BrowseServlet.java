@@ -35,20 +35,20 @@ public class BrowseServlet extends HttpServlet {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
 		   // AWS VERSION
-//	       Connection connection = DriverManager.getConnection("jdbc:mysql://18.220.104.176:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
+			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 	        
 			// LOCAL VERSION
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
 			System.out.println("Connection valid: " + connection.isValid(10));
 			
             Statement statement = connection.createStatement();
             
             // AWS VERSION
-//          String useDB = "use moviedb;";
+          String useDB = "use moviedb;";
           
             // LOCAL VERSION
-            String useDB = "use cs122b;";
+//            String useDB = "use cs122b;";
             
             String query = "SELECT name FROM genres;";
             

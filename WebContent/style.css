@@ -2,6 +2,22 @@ html {
   font-family: Roboto, sans-serif;
 }
 
+body {
+	z-index: 1;
+}
+
+.background {
+	height: 100vh;
+	background: url("Nebula.jpg");
+	opacity: 0.5;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	position: absolute;
+	z-index : -100;
+}
+
 /* LOGIN PAGE */
 
 form {
@@ -104,7 +120,109 @@ span {
 /* BROWSE PAGE */
 
 .genre_div {
-	margin: 5% auto;
+	margin: 0 auto;
 	width: 70%;
+	text-align: left;
+}
+
+.genre-title{
+	margin: 5% auto auto 15.5%;
+}
+
+.title-title{
+	margin: 5% auto auto 15.5%;
+	
+}
+
+/* MOVIE SINGLE */
+.movie-div-single {
+  border: 5px solid #2D719C;
+  border-radius: 10px;
+  width: 30%;
+  margin: auto auto auto 5%;
+  display: inline-block;
+}
+
+img {
+  width: 20%;
+  display: inline-block;
+  margin: auto auto auto 20%;
+}
+
+.details-title {
+  margin: 5% auto auto 20%;
+}
+
+/* RESULTS PAGE */
+.results-search {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.results-browse {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-right: 7%;
+}
+
+.results-cart {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin-right: 14%;
+}
+
+#form1 {
+	width: 10%;
+	margin-left: 1%;
+	font-size: 24px;
+}
+
+.listing-div {
 	text-align: center;
 }
+.next-btn {
+	float: right;
+	margin: auto 5%;
+}
+.prev-btn {
+	float:left;
+	margin: auto 5%;
+}
+
+.show-listing {
+	display: inline-block;
+}
+
+.next-prev-div {
+	margin-top: 1%;
+	text-align: center;
+}
+
+#limit-button {
+}
+
+#movie-table {
+	width: 80%;
+	margin: 2% auto;
+}
+.listing-title {
+	margin-left: 4%;
+}
+
+/* CART */
+.cart-div {
+	position: absolute;
+	margin: 10% auto auto 15%;
+	z-index: 100;
+	height: 60vh;
+	width: 140vh;
+	background-color: white;
+}
+
+.cart-title {
+	margin: 3% auto auto 3%;
+}
+

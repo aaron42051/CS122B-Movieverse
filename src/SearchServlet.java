@@ -36,8 +36,8 @@ public class SearchServlet extends HttpServlet {
 		
 		String title = request.getParameter("movie-title");
 		
-		System.out.println();
-		System.out.println("title: " + title);
+		
+
 		int year = 0;
 		try {
 			year = Integer.parseInt(request.getParameter("movie-year"));
@@ -59,31 +59,52 @@ public class SearchServlet extends HttpServlet {
 		
 		System.out.println();
 		
+		String search = request.getParameter("search");
+		
+		String genre = request.getParameter("genre");
+		
+		String browse = request.getParameter("browse");
+
+
+		
 		response.setContentType("text/html");
 
 		try {
 			
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
-//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 
             Statement statement = connection.createStatement();
             
             // AWS VERSION
-//          String useDB = "use moviedb;";
+          String useDB = "use moviedb;";
           
             // LOCAL VERSION
-            String useDB = "use cs122b;";
+//            String useDB = "use cs122b;";
             
             statement.execute(useDB);
             
-            String baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m, stars s, stars_in_movies sm WHERE ";
+            String baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m WHERE ";
             
             boolean first = true;
-            
-            if (title != "") {
-            	baseQuery += "m.title LIKE \"%" + title + "%\"";
+            if (star != null && star != "") {
+
+            	first = false;
+            	baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m, stars s, stars_in_movies sm WHERE m.id = sm.movieId AND s.id = sm.starId AND s.name LIKE \"%" + star + "%\" ";
+            }
+            if (title != null && title != "") {
+            	System.out.println("!");
+            	if(!first) {
+            		baseQuery += " AND ";
+            	}
+            	if (browse != null) {
+                	baseQuery += "m.title LIKE \"" + title + "%\"";
+            	}
+            	else {
+                	baseQuery += "m.title LIKE \"%" + title + "%\"";
+            	}
             	first = false;
             }
             if (year != 0) {
@@ -93,35 +114,36 @@ public class SearchServlet extends HttpServlet {
             	baseQuery += "m.year = " + year;
             	first = false;
             }
-            if (director != "") {
+            if (director != null && director != "") {
             	if(!first) {
             		baseQuery += " AND ";
             	}
             	first = false;
-            	baseQuery += " m.director = \"" + director + "\"";
+            	baseQuery += " m.director LIKE \"%" + director + "%\"";
             }
-            if (star != "") {
-            	if(!first) {
-            		baseQuery += " AND ";
-            	}
-            	first =false;
-            	baseQuery += " m.id = sm.movieId AND s.id = sm.starId AND s.name LIKE \"%" + star + "%\"";
-            }
+
             baseQuery += ";";
-            
+        	if(search != null) {
+        		baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m WHERE m.title = \""+ title + "\"";
+        	}
+        	if(genre != null) {
+        		baseQuery = "SELECT m.id, m.title, m.year, m.director FROM genres g, movies m, genres_in_movies gm WHERE g.id = gm.genreId AND m.id = gm.movieId AND g.name =\"" + genre + "\";";
+        	}
+        	System.out.println("CONSTRUCTED: ");
             System.out.println(baseQuery);
-            
             ResultSet rs = statement.executeQuery(baseQuery);
             
+            System.out.println("EXECUTING...");
+
 //          open up new JSON
             String responseObject = "{";
             
             while(rs.next()) {
+            	
 				String resultID = rs.getString(1);
             	String resultTitle = rs.getString(2);
             	String resultYear = Integer.toString(rs.getInt(3));
             	String resultDirector = rs.getString(4);
-            	
 //            	new Movie object in JSON, with ID as the key
             	responseObject += "\"" + resultID + "\"" + ": {";
             	
@@ -142,7 +164,6 @@ public class SearchServlet extends HttpServlet {
             	String att = "genre" + Integer.toString(genreNum);
             	grs.next();
             	String gen = grs.getString(1);
-            	System.out.println("gen: " + gen);
             	responseObject = setAttribute(responseObject, att, gen, true);
 
             	while(grs.next()) {
@@ -177,6 +198,7 @@ public class SearchServlet extends HttpServlet {
             
 //          close entire JSON response
             responseObject += "}";
+            
         	response.getWriter().write(responseObject);
 
 		}

@@ -1,3 +1,10 @@
+page_limit = 10;
+page_start = 0;
+current_movies = "";
+sort = "";
+titleSort = 1;
+yearSort = 1;
+shopping_cart = {};
 
 // LOGIN FORM
 
@@ -33,16 +40,8 @@ function getRequest(servlet, form, successFunction) {
 	jQuery.get(servlet, form.serialize(), (resultDataString) => successFunction(resultDataString));
 }
 
-function loginSuccess(data) {
-   
-   var result = JSON.parse(data);
-   console.log("data: " + data);
-   console.log("status: " + result["status"]);
-   if(result["status"] == "success")
-   {
-    console.log("login success");
-
-    $("body").empty();
+function setupMainPage() {
+    $("body").empty().append($("<div>", {class:"background"}));
 
     title_div = $("<div>", {class: "title-div"});
     welcome = $("<h1>", {class: "welcome", text: "Welcome to Movieverse!"});
@@ -52,14 +51,24 @@ function loginSuccess(data) {
     title_div.append(welcome).append(br).append(welcome_desc);
 
     button_div = $("<div>", {class: "btn-div"});
-    browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse"});
+    browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
     search = $("<button>", {type: "button", class: "btn btn-secondary", id: "search-movies", text: "Search"});
-
 
     button_div.append(browse).append(search);
     $("body").append(title_div).append(button_div);
+    setupSearchPage();
+}
+
+function loginSuccess(data) {
+   
+   var result = JSON.parse(data);
+   console.log("data: " + data);
+   console.log("status: " + result["status"]);
+   if(result["status"] == "success")
+   {
+    console.log("login success");
+    setupMainPage();
     
-    //alert("Login success!");
    }
   
    else {
@@ -86,70 +95,49 @@ function submitSearch(formSubmitEvent) {
 
 	formSubmitEvent.preventDefault();
 	
+	page_start = 0;
+	sort = "";
+	titleSort = 1;
+	yearSort = 1;
 	postRequest("SearchServlet", $("#search-form"), searchSuccess);
 
 }
 
-function searchSuccess(data) {
-	console.log()
-	console.log("Returned with movie search results: ");
+function setupBrowsePage() {
+	$("#browse-movies").click(function() {
+		console.log("BROWSE");
+		jQuery.post("BrowseServlet", browseSuccess);
+	});
+}
+
+function browseSuccess(data) {
 	console.log("data: " + data);
 	var result = JSON.parse(data);
-	
-	$("body").empty();
-	resultsTitle = $("<h1>", {class:"main-title", text: "Search Results:"});
-	$("body").append(resultsTitle);
-	
-	if(data == "{}") {
-		$("body").append($("<h3>", {text: "No results found!"}));
+	console.log("result dictionary: " + result);
+	$("body").empty().append($("<div>", {class:"background"}));
+		
+	browse_title = $("<h1>", {class:"search-title", text: "Browse the Movieverse"});
+	genre_title = $("<h3>", {class: "genre-title", text: "Browse by Genre:"});
+	genre_div = $("<div>", {class:"genre_div"});
+    search = $("<button>", {type: "button", class: "btn btn-secondary inline results-search", id: "search-movies", text: "Search"});
+	for (key in result) {
+		genre_div.append($("<button>", {class: "btn btn-primary genre-btn", text: result[key], onclick: "jQuery.post(\"SearchServlet\", {genre: \"" + result[key] +
+			"\"}, searchSuccess)"}));
 	}
-	for (id in result) {
-		movieDiv = $("<div>", {class: "movie-div"});
-		movieTitle = $("<h2>", {class: "movie-title", text: result[id]["title"]});
-		movieDirector = $("<h3>", {class: "movie-info", text: result[id]["director"]});
-		movieYear = $("<h3>", {class: "movie-info", text: result[id]["year"]});
-		
-		genreList = result[id]["genres"];
-		var buildGenre = "Genres: ";
-
-		length = Object.keys(genreList).length;
-		index = 1;
-		for (key in genreList) {
-			buildGenre = genreList[key];
-			if(index != length) {
-				buildGenre += ", ";
-			}
-			index++;
-		}
-		movieGenres = $("<h3>", {class: "movie-genres", text: buildGenre});
-
-		
-		
-		
-		
-		starList = result[id]["stars"];
-		var buildStars = "Starring: ";
-		movieStars = $("<h4>", {class: "movie-stars", text: buildStars});
-		
-		length = Object.keys(starList).length;
-		index = 1;
-		for (star in starList) {
-			var span = starList[star];
-			if(index != length) {
-				span2 = span + ", ";
-			}
-			index++;
-			movieStars.append( $("<span>", {style:"color: blue", text:span2, onclick: "star_page(\"" + span + "\")" }) );
-		}
-		movieID = $("<h4>", {text: "id: " + id});
-		
-		movieDiv.append(movieTitle).append(movieDirector).append(movieYear).append(movieGenres).append(movieStars).append(movieID);
-		$("body").append(movieDiv);
-		
-		
+	
+	$("body").append(browse_title).append(genre_title).append(genre_div).append(search);
+	setupSearchPage();
+	  	 
+	alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+	title_title = $("<h3>", {class: "title-title", text: "Browse by Title:"});
+	title_div = $("<div>", {class:"genre_div"});
+	for (letter in alphabet) {
+		title_div.append($("<button>", {class: "btn btn-primary genre-btn", text: alphabet[letter], onclick: "jQuery.post(\"SearchServlet\", {\"movie-title\": \"" + alphabet[letter] +
+			"\", browse: \"true\"}, searchSuccess)"}));
 	}
-
-
+	
+	$("body").append(title_title).append(title_div);
+	
 }
 
 function setupSearchPage() {
@@ -157,7 +145,9 @@ function setupSearchPage() {
 
   	  console.log("choose Search option");
 
-  	  $("body").empty();
+  	  $("body").empty().append($("<div>", {class:"background"}));
+      browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
+	  cart = $("<button>", {type: "button", class: "btn btn-success inline results-cart", id: "cart-page", text: "Cart", onclick: "cartPage(\"\")"});
 
   	  // ADD FORM INPUTS TO PAGE
   	  search_title = $("<h1>", {class:"search-title", text: "Search the Movieverse"});
@@ -175,48 +165,434 @@ function setupSearchPage() {
   	  s_button_div = $("<div>", {class:"search_button_div"});
   	  s_button_div.append($("<input>", {class:"btn btn-primary", id:"search_button", value:"Submit", type:"submit"}));
   	  search_div.append(s_button_div);
-  	  $("body").append(search_title).append(search_div);
+  	  $("body").append(search_title).append(search_div).append(browse).append(cart);
   	  
   	  $("#search-form").submit((event) => submitSearch(event));
 
   	});
 }
 
-function setupBrowsePage() {
-	$("#browse-movies").click(function() {
-		console.log("BROWSE");
-		jQuery.post("BrowseServlet", browseSuccess);
-	});
+function searchSuccess(data) {
+	$("body").empty().append($("<div>", {class:"background"}));
+
+	current_movies = data;
+	
+	
+	// IF EMPTY
+	if(data == "") {
+		$("body").append($("<h3>", {style: "text-align: center", text: "No results found!"}));
+	}
+	else {
+		
+	
+		var result = JSON.parse(data);
+
+		last = Object.keys(result)[Object.keys(result).length-1];
+		console.log("LAST: " + last);
+		
+		resultsTitle = $("<h1>", {class:"main-title", text: "Search Results:"});
+	    search = $("<button>", {type: "button", class: "btn btn-secondary inline results-search", id: "search-movies", text: "Search"});
+	    browse = $("<button>", {type: "button", class: "btn btn-primary inline results-browse", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
+	    cart = $("<button>", {type: "button", class: "btn btn-success inline results-cart", id: "cart-page", text: "Cart", onclick: "cartPage(\"\")"});
+	    
+//	    cart.click(function() {
+//	    	cartPage("");
+//	    });
+//	    search.click(function() {
+//	    	setupMainPage();
+//	    });
+	    setupSearchPage();
+	    setupBrowsePage();
+	    // LISTING INPUT
+	    listingDiv = $("<div>", {class: "listing-div"});
+	    listingTitle = $("<h3>", {class: "listing-title inline", text: "# of Listings: "});
+	    listingInput = $("<input>", {type: "text", id:"form1", class:"form-control inline"});
+	    listingLabel = $("<label>", {for: "form1", id:"listing-label", class: "", text: page_limit});
+	    listingButton = $("<button>", {class:"btn btn-primary", id: "limit-button", text: "SHOW"} );
+	    listingDiv.append(listingTitle).append(listingInput).append(listingLabel).append(listingButton);
+	    
+	    
+	    // NEXT AND PREVIOUS
+	    nextprevDiv = $("<div>", {class: "next-prev-div"});
+	    nextBtn = $("<button>", {class: "next-btn btn btn-primary inline", text: "NEXT"});
+	    showingNum = page_start + page_limit;
+	    if(showingNum > Object.keys(result).length) {
+	    	showingNum = Object.keys(result).length;
+	    }
+	    showListing = $("<h2>", {class: "show-listing inline", text: "Showing " + (page_start + 1) + " - " + showingNum});
+	    prevBtn = $("<button>", {class: "prev-btn btn btn-primary inline", text: "PREV"});
+	    nextprevDiv.append(nextBtn).append(showListing).append(prevBtn);
+	    
+	    nextBtn.click(function() {
+	    	totalLimit = page_start + page_limit;
+	    	console.log(Object.keys(result).length + " vs. " + totalLimit);
+	    	if (Object.keys(result).length > totalLimit) {
+	    		page_start += page_limit;
+	    		searchSuccess(current_movies);
+	    	}
+	    	else {
+	    		alert("No more movies to show");
+	    	}
+	    });
+	    
+	    prevBtn.click(function() {
+	    	floor = page_start - page_limit;
+	    	if(floor >= 0) {
+	    		page_start -= page_limit;
+	    		searchSuccess(current_movies);
+	    	}
+	    	else {
+	    		alert("No more movies to show");
+	    	}
+	    });
+	    
+	    
+		$("body").append(resultsTitle).append(listingDiv).append(nextprevDiv).append(search).append(browse).append(cart);
+		setupSearchPage();
+		keys = Object.keys(result);
+		
+		// LIMIT # OF LISTINGS
+		temp_limit = page_limit;
+		if(keys.length - page_start < temp_limit) {
+			temp_limit = keys.length;
+		}
+		else {
+			temp_limit += page_start;
+		}
+		
+		// CREATE MOVIE TABLE
+		
+		movieTable = $("<table>", {class:"table table-striped table-bordered", style:"background: #FFFFFF", id:"movie-table"});
+		tableHead = $("<thead>");
+		headRow = $("<tr>").append($("<th>", {text: "id"})).append($("<td>", {text:"title", class:"dropdown-toggle", onclick: "sortTable(\"title\")"})).append(
+				$("<td>", {text: "year", class:"dropdown-toggle", onclick: "sortTable(\"year\")"})).append(
+				$("<td>", {text: "director"})).append($("<td>", {text:"Click for genres"})).append($("<td>", {text: "Click for stars"})).append(
+				$("<td>", {text: "Add to Cart"}));
+		tableBody = $("<tbody>");
+	
+		movieTable.append(tableHead.append(headRow)).append(tableBody);
+		
+		
+			
+		for (i = page_start; i < temp_limit; i++) {
+
+			if (sort == "title") {
+				var items = Object.keys(result).map(function(key) {
+				    return [key, result[key]];
+				});				
+				
+				items.sort(function(a, b) {
+					var A = a[1]["title"].toLowerCase(), B = b[1]["title"].toLowerCase();
+					if (A < B) {
+						return -titleSort;
+					}
+					if(A > B) {
+						return titleSort;
+					}
+					else {
+						return 0;
+					}
+				});
+				new_result = {};
+				for (item in items) {
+					new_result[items[item][0]] = items[item][1];
+				}
+				result = new_result;
+				keys = Object.keys(result);
+			}
+			if (sort == "year") {
+				var items = Object.keys(result).map(function(key) {
+				    return [key, result[key]];
+				});				
+				
+				items.sort(function(a, b) {
+					if(yearSort == 1) {
+						return a[1]["year"] - b[1]["year"];
+					}
+					else {
+						return b[1]["year"] - a[1]["year"];
+					}
+				});
+				new_result = {};
+				for (item in items) {
+					new_result[items[item][0]] = items[item][1];
+				}
+				result = new_result;
+				keys = Object.keys(result);
+			}
+			id = keys[i];
+
+			movieRow = $("<tr>");
+			movieID = $("<td>", {text: id});
+			movieTitle = $("<td>");
+			movieDirector = $("<td>", {text: result[id]["director"]});
+			movieYear = $("<td>", {text: result[id]["year"]});
+			
+			
+	//		GENRE LIST
+			genreList = result[id]["genres"];
+			movieGenres = $("<td>");
+			dropdownG = $("<a>", {class:"dropdown-toggle", "data-toggle": "dropdown", "aria-haspopup": true, "aria-expanded":"false", text:"Genres"});
+			dropdownMenuG = $("<div>", {class:"dropdown-menu"});
+			buildGenre = "";
+			length = Object.keys(genreList).length;
+			index = 1;
+			for (key in genreList) {
+				dropdownMenuG.append($("<a>", {class:"dropdown-item", text: genreList[key]}));
+				buildGenre += genreList[key];
+				if(length != index) {
+					buildGenre += ", ";
+				}
+				index++;
+			}
+			movieGenres.append(dropdownG.append(dropdownMenuG));
+	
+	//		STAR LIST
+			starList = result[id]["stars"];
+
+			movieStars = $("<td>");
+			dropdownS = $("<a>", {class:"dropdown-toggle", "data-toggle": "dropdown", "aria-haspopup": true, "aria-expanded":"false", text:"Stars"});
+			dropdownMenuS = $("<div>", {class:"dropdown-menu"});
+			length = Object.keys(starList).length;
+			buildStars = "";
+			index = 1;
+			for (star in starList) {
+				dropdownMenuS.append($("<a>", {class:"dropdown-item", onclick: "star_page(\"" + starList[star] + "\")", text: starList[star]}));
+				buildStars += starList[star];
+				if(length != index) {
+					buildStars += ", ";
+				}
+				index++;
+			}
+			movieStars.append(dropdownS.append(dropdownMenuS));
+			
+			
+			titleSpan = $("<span>", {style:"color:blue; font-size: 3vh;", text: result[id]["title"], onclick: "movie_page(\"" +
+				result[id]["title"] + "\", \"" +
+				result[id]["director"] + "\", \"" +
+				result[id]["year"] + "\", \"" +
+				buildGenre + "\", \"" +
+				buildStars + "\")"
+			});
+			movieTitle.append(titleSpan);
+	
+			movieRow.append(movieID).append(movieTitle).append(movieYear).append(movieDirector).append(movieGenres).append(movieStars).append(
+					$("<button>", {class:"btn btn-success", text: "Add to cart", onclick: "cartPage(\""+result[id]["title"]+"\")"}));
+			tableBody.append(movieRow);
+		}
+		
+		
+
+		$("body").append(movieTable);
+		$("#limit-button").click(function() {
+			page_start = 0;
+			submitLimit();
+		});
+	}
 }
 
-function browseSuccess(data) {
-	console.log("data: " + data);
-	var result = JSON.parse(data);
-	console.log("result dictionary: " + result);
-	$("body").empty();
-		
-	browse_title = $("<h1>", {class:"search-title", text: "Browse the Movieverse"});
-	genre_div = $("<div>", {class:"genre_div"});
-	for (key in result) {
-		genre_div.append($("<button>", {class: "btn btn-primary genre-btn", text: result[key]}));
+function sortTable(new_sort) {
+	if(sort == "title" && sort == new_sort) {
+		titleSort = -titleSort;
 	}
-	
-	$("body").append(browse_title).append(genre_div);
-	
-	  	 
-	alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
-	title_div = $("<div>", {class:"genre_div"});
-	for (letter in alphabet) {
-		title_div.append($("<button>", {class: "btn btn-primary genre-btn", text: letter}));
+	else if (sort == "year" && sort == new_sort) {
+		yearSort = -yearSort;
 	}
-	
+	else {
+		sort = new_sort;
+		titleSort = 1;
+		yearSort = 1;
+	}
+	searchSuccess(current_movies);
+}
+
+
+
+function submitLimit() {
+	console.log("SUBMIT LIMIT");
+	console.log(parseInt($("#form1").val()));
+	page_limit = parseInt($("#form1").val());
+	$("#listing-label").text = page_limit;
+	searchSuccess(current_movies);
 }
 
 
 function star_page(star) {
-	$("body").empty();
+	console.log("STAR PAGE");
+	jQuery.post("StarServlet", {"star": star}, (resultDataString) => starSuccess(resultDataString));	
 	
 }
 
+function starSuccess(data) {
+	results = JSON.parse(data);
+	console.log("star data: " + data);
+	
+	$("body").empty().append($("<div>", {class:"background"}));
+	
+	title = $("<h1>", {class:"main-title", text: results["name"]});
+	details = $("<h3>", {class: "details-title", text: "Star Details: (Placeholder Image)"});
+	img = $("<img>", {src: "movie-star.jpg"});
+	movie_div = $("<div>", {class:"movie-div-single"});
+	year = $("<h3>", {class:"movie-info", text: "Birth Year: " + results["birthYear"]});
+	
+	movies = $("<h3>", {class: "movie-genre", text: "Movies: "});
+	index = 0;
+	for (m in results["movies"]) {
+		var span = results["movies"][m];
+		console.log(span);
+		var span2 = span;
+		if(Object.keys(results["movies"]).length != (index + 1)) {
+			span2 +=", ";
+		}	
+		movies.append($("<span>", {style: "color: blue", text: span2, onclick:"jQuery.post(\"SearchServlet\", {\"movie-title\": \"" + span + "\", \"search\":\"true\"}, movieSuccess)"}));
+		index++;
+	}
+	if (results["birthYear"] != 0) {
+		movie_div.append(year);
+	}
+	movie_div.append(movies);
+	$("body").append(title).append(details).append(img).append(movie_div);
+	
+ 
+}
+
+function movieSuccess(data) {
+	var results = JSON.parse(data);
+	
+	console.log("movie data: " + data);
+	
+	// CONSTRUCT GENRE LIST
+	
+	id = Object.keys(results)[0];
+	
+	genreList = results[id]["genres"];
+	var buildGenre = "";
+
+	length = Object.keys(genreList).length;
+	index = 0;
+	for (key in genreList) {
+		buildGenre += genreList[key];
+
+		if(length != (index+1)) {
+			buildGenre += ", ";
+		}
+		index++;
+	}
+
+	// CONSTRUCT STAR LIST
+	starList = results[id]["stars"];
+	var buildStars = "";
+	length = Object.keys(starList).length;
+	listSpans = [];
+	index = 0;
+	for (star in starList) {
+		buildStars += starList[star];
+
+		if(length != (index + 1)) {
+			buildStars += ", ";
+		}	
+		index++;
+	}
+	movie_page(results[id]["title"], results[id]["director"], results[id]["year"], buildGenre, buildStars);
+}
+
+function movie_page(movie_title, movie_director, movie_year, movie_genres, movie_stars) {
+	$("body").empty().append($("<div>", {class:"background"}));
+	
+	title = $("<h1>", {class:"main-title", text: movie_title});
+	details = $("<h3>", {class: "details-title", text: "Movie Details: (Placeholder Image)"});
+	img = $("<img>", {src: "movie-poster.jpg"});
+	movie_div = $("<div>", {class:"movie-div-single"});
+	//rating = $("<h3>", {class: "movie-rating":, text: "Rating: " + })
+	director = $("<h3>", {class:"movie-info", text: "Director: " + movie_director});
+	year = $("<h3>", {text: "Year: " + movie_year});
+	
+//	GENRES
+	genres = $("<h3>", {class: "movie-genre", text: "Genres: "});
+	genreList = movie_genres.split(",");
+	console.log("GENRELIST: " + genreList);
+	spanList = [];
+	for (g in genreList) {
+		span_text = genreList[g];
+		genres.append($("<span>", {style:"color:blue;", onclick: "jQuery.post(\"SearchServlet\", {genre: \"" + span_text +
+			"\"}, searchSuccess)", text:span_text}));
+//		spanList.push("<span style= \"color: blue;\" onclick= \"genre_page(\"" + span_text + "\")\"> " + span_text + " </span>");
+	}
+//	genres.append(spanList.join());
+	
+	
+//	STARS
+	stars = $("<h4>", {class:"movie-stars", text: "Starring: "});
+	starList = movie_stars.split(", ");
+	spanList = [];
+	index = 1;
+	for (s in starList) {
+		span_text = starList[s];
+		span_text2 = span_text;
+		if(Object.keys(starList).length != index){
+			span_text2+=", ";
+		}
+		console.log(starList[s]);
+		index++;
+		stars.append($("<span>", {style: "color:blue;", onclick: "star_page(\"" + span_text + "\")", text: span_text2}));
+//		spanList.push("<span style= \"color: blue;\" onclick= \"star_page(\"" + span_text + "\")\"> " + span_text + " </span>");
+	}
+//	stars.append(spanList.join());
+	
+	movie_div.append(img).append(director).append(year).append(genres).append(stars);
+	$("body").append(title).append(details).append(img).append(movie_div);
+}
 
 
+function cartPage(title) {
+	console.log("CART PAGE");
+	$("body").empty().append($("<div>", {class:"background"}));
+	cartDiv = $("<div>", {class:"cart-div"});
+	cartTitle = $("<h1>", {class: "cart-title", text: "Shopping Cart:"});
+	$("body").append(cartDiv.append(cartTitle));
+	
+	cartTable = $("<table>", {class:"table table-striped table-bordered", style:"background: #FFFFFF", id:"cart-table"});
+	tableHead = $("<thead>");
+	headRow = $("<tr>").append($("<td>", {text: "Movie Title"})).append($("<td>", {text: "Price"})).append($("<td>", {text:"Qty"})).append($("<td>")).append($("<td>"));
+	
+	tableBody = $("<tbody>");	
+	
+	cartTable.append(tableHead.append(headRow));
+	if ($.inArray(title, Object.keys(shopping_cart)) == -1 && title != "") {
+		shopping_cart[title] = 1;
+	}
+
+	else if(title != ""){
+		shopping_cart[title] += 1;
+		console.log("HERE");
+	}
+	
+	for (k in shopping_cart) {
+		console.log("Adding: " + k);
+		new_row = $("<tr>", {id: k});
+		inputBox = $("<td>").append($("<input>", {type:"number", value: shopping_cart[k], id: "inputBox"}));
+		updateBtn = $("<td>").append($("<button>", {text: "Update", id: "update-btn"}));
+		removeBtn = $("<td>").append($("<button>", {text: "Remove", id: "remove-btn", value:k}));
+		new_row.append($("<td>", {text: k, style: "font-size: 3vh"})).append($("<td>", {style: "font-size: 3vh", text: "$5.99"})).append(inputBox).append(updateBtn).append(removeBtn);
+		
+		updateBtn.click(function() {
+			shopping_cart[k] = $("#inputBox").val();
+			console.log($("#inputBox").val());
+			alert(k + " quantity updated to: " + shopping_cart[k]);
+			cartPage("");
+		});
+		removeBtn.click(function() {
+			delete shopping_cart[k];
+			alert(k + " removed from cart!");
+			cartPage("");
+		});
+		tableBody.append(new_row);
+	}
+	cartTable.append(tableBody);
+	cartDiv.append(cartTable);
+	
+    browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
+    search = $("<button>", {type: "button", class: "btn btn-secondary", id: "search-movies", text: "Search"});
+
+    $("body").append(browse).append(search);
+}
