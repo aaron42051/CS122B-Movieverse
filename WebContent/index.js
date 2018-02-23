@@ -14,7 +14,6 @@ function submitLoginForm(formSubmitEvent) {
 
   formSubmitEvent.preventDefault();
 
-
   postRequest("LoginServlet", $("#login_form"), loginSuccess);
 }
 
@@ -60,9 +59,9 @@ function setupMainPage() {
 }
 
 function loginSuccess(data) {
-   
-   var result = JSON.parse(data);
    console.log("data: " + data);
+
+   var result = JSON.parse(data);
    console.log("status: " + result["status"]);
    if(result["status"] == "success")
    {

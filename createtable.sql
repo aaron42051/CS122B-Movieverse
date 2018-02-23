@@ -10,6 +10,22 @@ CREATE TABLE IF NOT EXISTS MOVIES
     PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS employees
+(
+	email varchar(50) primary key,
+	password varchar(20) not null,
+	fullname varchar(100)
+);
+
+CREATE TABLE IF NOT EXISTS StarID
+(
+	id int primary key,
+	maxID int
+);
+
+drop table movieid;
+drop table starid;
+
 CREATE TABLE IF NOT EXISTS STARS 
 (
 	id varchar(10) NOT NULL DEFAULT '',

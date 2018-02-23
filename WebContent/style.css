@@ -29,7 +29,7 @@ form {
 
 .btn-div {
   margin: 3% auto;
-  width: 14%;
+  width: 18%;
 }
 
 .title-div {
@@ -42,6 +42,10 @@ form {
   font-size: 9vh;
 }
 
+/* DASHBOARD */
+.employeeEmbed {
+	display: none;
+}
 /* SEARCH PAGE */
 .search-title {
   font-size: 7vh;
@@ -225,4 +229,15 @@ img {
 .cart-title {
 	margin: 3% auto auto 3%;
 }
+
+/* METADATA */
+.table-title {
+	margin: 5% auto auto 5%;
+}
+
+.table-div {
+	margin: auto auto auto 5%;
+	width: 75%;
+}
+
 

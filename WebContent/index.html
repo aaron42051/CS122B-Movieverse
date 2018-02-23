@@ -13,6 +13,8 @@
     <link href="css/mdb.min.css" rel="stylesheet">
     <!-- Your custom styles (optional) -->
     <link href="style.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
     
 </head>
 
@@ -20,7 +22,7 @@
 	<div class='background'></div>
 
 <!-- LOGIN PAGE -->
-<form id="login_form" method="post" action="#">
+<form id="login_form" method="post">
       <h1 class="h1 text-center mb-4">Sign in to Movieverse</h1>
       <br>
       <div class="md-form">
@@ -38,6 +40,8 @@
       <div class="text-center">
           <input id="login-button" class="btn btn-primary my-3" type="submit" value="Login">
       </div>
+      <div class="g-recaptcha" data-sitekey="6Ldq3kYUAAAAAMlByDyq9UoGLiH4fbopgSVhINZX"></div>
+      
 </form>
 
 <!-- MAIN PAGE -->
