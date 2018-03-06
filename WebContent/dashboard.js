@@ -15,6 +15,14 @@ function submitAddStar(formSubmitEvent) {
 	postRequest("AddStarServlet", $("#add-star-form"), addStarSuccess);
 }
 
+function submitAddMovie(formSubmitEvent) {
+	console.log ("======== ADD MOVIE =========");
+	
+	formSubmitEvent.preventDefault();
+	
+	postRequest("AddMovieServlet", $("#search-form"), addMovieSuccess);
+}
+
 //function submitMetadata(formSubmitEvent) {
 //	console.log ("======== SHOW METADATA =========");
 //	
@@ -60,15 +68,52 @@ function setupMainPage() {
     title_div.append(welcome).append(br).append(welcome_desc);
 
     button_div = $("<div>", {class: "btn-div"});
-    add_movie = $("<button>", {type: "button", class: "btn btn-primary", id: "add-movie", text: "Add Movie", onclick: ""});
+    add_movie = $("<button>", {type: "button", class: "btn btn-primary", id: "add-movie", text: "Add Movie"});
     metadata = $("<button>", {type: "button", class: "btn btn-secondary", id: "metadata", text: "Metadata"});
     add_star = $("<button>", {type:"button", class: "btn btn-success", id: "add-star", text: "Add Star"});
 
     button_div.append(add_movie).append(metadata).append(add_star);
     $("body").append(title_div).append(button_div);
-    
+    setupAddMovie();
+
     setupAddStar();
     setupMetadata();
+}
+
+
+formTitles = {"Movie Title: " : "movie-title", "Movie Year: " : "movie-year",
+        "Director:         ": "movie-director",
+        "Star's Name: " : "movie-stars",
+        "Star Year:": "star-birth-year",
+        "Genre:": "movie-genre"};
+function setupAddMovie() {
+	$("#add-movie").click(function() {
+		console.log("Add New Movie");
+		$("body").empty();
+		
+//	      browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
+//		  cart = $("<button>", {type: "button", class: "btn btn-success inline results-cart", id: "cart-page", text: "Cart", onclick: "cartPage(\"\")"});
+
+	  	  // ADD FORM INPUTS TO PAGE
+	  	  am_title = $("<h1>", {class:"search-title", text: "Add a Move to the Movieverse"});
+	  	  am_div = $("<form>", {class:"search-div", id:"search-form", action: "#", method:"get"});
+	  	  for (title in formTitles) {
+	  	    title_div = $("<div>", {class:"inline"});
+	  	    title_div.append($("<h3>", {class:"h3", text: title}));
+
+	  	    input_div = $("<div>", {class:"bar-div inline"});
+	  	    input_div.append($("<input>", {type:"text", id:formTitles[title], class:"form-control inline", name:formTitles[title]}));
+
+	  	    am_div.append(title_div).append(input_div);
+	  	  }
+
+	  	  s_button_div = $("<div>", {class:"search_button_div"});
+	  	  s_button_div.append($("<input>", {class:"btn btn-primary", id:"search_button", value:"Submit", type:"submit"}));
+	  	  am_div.append(s_button_div);
+	  	  $("body").append(am_title).append(am_div);
+	  	  
+	  	  $("#search-form").submit((event) => submitAddMovie(event));
+	});
 }
 
 function setupAddStar() {
@@ -148,9 +193,18 @@ function metadataSuccess(data) {
 		table_table.append(tableHead.append(headRow)).append(tableBody);
 		table_div.append(table_table)
 		$("body").append(table_title).append(table_div);
+		
+		back = $("<button>", {class:"btn btn-primary", onclick: "setupMainPage()"});
+		$("body").append*(back);
 	}
 	
 	
 }
 
+function addMovieSuccess(data) {
+	console.log("data: " + data);
+	var result = JSON.parse(data);
+	
+	alert("Add movie: " + result["status"] + ", message: " + result["message"]);
+}
 $("#login_form").submit((event) => submitLoginForm(event));

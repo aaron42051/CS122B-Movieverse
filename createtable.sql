@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS MOVIES
     title varchar(100) NOT NULL DEFAULT '',
     year int NOT NULL,
     director varchar(100) NOT NULL DEFAULT '',
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FULLTEXT(title)
 );
 
 CREATE TABLE IF NOT EXISTS employees
@@ -31,8 +32,11 @@ CREATE TABLE IF NOT EXISTS STARS
 	id varchar(10) NOT NULL DEFAULT '',
     name varchar(100) NOT NULL DEFAULT '',
     birthYear int,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FULLTEXT(name)
 );
+
+
 
 CREATE TABLE IF NOT EXISTS STARS_IN_MOVIES 
 (

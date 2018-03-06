@@ -42,6 +42,18 @@ form {
   font-size: 9vh;
 }
 
+.autocomplete-div {
+	margin: 3% auto;
+	width: 35%;
+}
+
+.search-bar {
+	width: 50%;
+	margin: auto auto auto 5%;
+}
+
+.autocomplete-selected { background: #F0F0F0; }
+
 /* DASHBOARD */
 .employeeEmbed {
 	display: none;

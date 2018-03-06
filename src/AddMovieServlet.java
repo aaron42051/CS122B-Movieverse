@@ -33,6 +33,8 @@ public class AddMovieServlet extends HttpServlet {
 		String genre = request.getParameter("movie-genre");
 		String director = request.getParameter("movie-director");
 		
+		System.out.println("!!");
+		
 		if (title == null || year == null || star == null || birthYear == null || genre == null || director == null) {
 			response.getWriter().write("{\"status\": \"failed\", \"message\": \"Must fill in all inputs correctly!\"}");
 		}

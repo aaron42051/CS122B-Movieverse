@@ -25,6 +25,11 @@ function submitBrowseForm(formSubmitEvent) {
 	postRequest("BrowseServlet", $("#login_form"), browseSuccess);
 }
 
+function submitMainSearch() {
+	console.log("Searching for title: " + $("#autocomplete").val());
+	jQuery.post("FullTextServlet", {"title": $("#autocomplete").val()}, searchSuccess);
+}
+
 function postRequest (servlet, form, successFunction) {
 	console.log("POSTING: " + servlet);
 	jQuery.post(
@@ -37,6 +42,52 @@ function postRequest (servlet, form, successFunction) {
 
 function getRequest(servlet, form, successFunction) {
 	jQuery.get(servlet, form.serialize(), (resultDataString) => successFunction(resultDataString));
+}
+
+function handleSelectSuggestion(suggestion) {
+	console.log(suggestion);
+	if (suggestion["data"].indexOf("tt") >= 0) {
+//		movie_page(movie_title, movie_director, movie_year, movie_genres, movie_stars)
+		movie_page(suggestion["value"], suggestion["director"], suggestion["year"], suggestion["genres"].toString(), suggestion["stars"].toString());
+	}
+	if (suggestion["data"].indexOf("nm") >= 0) {
+		star_page(suggestion["value"]);
+	}
+}
+
+function ajaxFunction(query, doneCallback) {
+	var ajaxRequest;  
+	console.log("initiating ajaxFunction, checking for 3 characters");
+	try{
+		ajaxRequest = new XMLHttpRequest();
+	} catch (e){
+		try{
+			ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+		} catch (e) {
+			try{
+				ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e){
+				alert("Browser Error");
+				return false;
+			}
+		}
+	}
+
+		if($("#autocomplete").val().length > 2){
+			console.log("3 confirmed, initiate autocomplete");
+
+			jQuery.ajax({
+				"method": "POST",
+				"url": "FullTextServlet?title=" + $("#autocomplete").val() + "&" + "ajax=true",
+				"success":function(data) {
+					AutocompleteSuccess(data, query, doneCallback);
+				},
+				"error": function(errorData) {
+					console.log("lookup ajax error");
+					console.log(errorData);
+				}
+			});
+	}
 }
 
 function setupMainPage() {
@@ -52,10 +103,28 @@ function setupMainPage() {
     button_div = $("<div>", {class: "btn-div"});
     browse = $("<button>", {type: "button", class: "btn btn-primary", id: "browse-movies", text: "Browse", onclick: "jQuery.post(\"BrowseServlet\", browseSuccess)"});
     search = $("<button>", {type: "button", class: "btn btn-secondary", id: "search-movies", text: "Search"});
+    
+    
+    // auto complete search bar
+
+    autocomplete_div = $("<div>", {class: "autocomplete-div"});
+    
+	search_title_div = $("<div>", {class:"inline"});
+  	search_title_div.append($("<h3>", {class:"h3", text: "Search: "}));
+  	
+  	input_div = $("<div>", {class:"search-bar inline"});
+  	input_div.append($("<input>", {type:"text",  class:"form-control inline", id:"autocomplete"}));
+
+  	ac_btn_div = $("<div>", {class: "inline"});
+  	ac_btn_div.append($("<button>", {class:"btn btn-success", id:"autocomplete_btn", text: "Submit", onClick:"submitMainSearch()"}));
+  	
+  	
+  	autocomplete_div.append(search_title_div).append(input_div).append(ac_btn_div);
 
     button_div.append(browse).append(search);
-    $("body").append(title_div).append(button_div);
+    $("body").append(title_div).append(button_div).append(autocomplete_div);
     setupSearchPage();
+    setupAutoComplete();
 }
 
 function loginSuccess(data) {
@@ -172,8 +241,9 @@ function setupSearchPage() {
 }
 
 function searchSuccess(data) {
-	$("body").empty().append($("<div>", {class:"background"}));
 
+	$("body").empty().append($("<div>", {class:"background"}));
+	console.log("data: " + data);
 	current_movies = data;
 	
 	
@@ -390,6 +460,21 @@ function searchSuccess(data) {
 	}
 }
 
+function setupAutoComplete() {
+	$('#autocomplete').autocomplete({
+	    lookup: function (query, doneCallback) {
+	    		ajaxFunction(query, doneCallback);
+	    },
+	    onSelect: function(suggestion) {
+	    		handleSelectSuggestion(suggestion)
+	    },
+	    // set the groupby name in the response json data field
+	    groupBy: "category",
+	    // set delay time
+	    deferRequestBy: 300,
+	});
+}
+
 function sortTable(new_sort) {
 	if(sort == "title" && sort == new_sort) {
 		titleSort = -titleSort;
@@ -405,8 +490,6 @@ function sortTable(new_sort) {
 	searchSuccess(current_movies);
 }
 
-
-
 function submitLimit() {
 	console.log("SUBMIT LIMIT");
 	console.log(parseInt($("#form1").val()));
@@ -415,11 +498,21 @@ function submitLimit() {
 	searchSuccess(current_movies);
 }
 
-
 function star_page(star) {
 	console.log("STAR PAGE");
 	jQuery.post("StarServlet", {"star": star}, (resultDataString) => starSuccess(resultDataString));	
 	
+}
+
+function AutocompleteSuccess(data, query, doneCallback) {
+	console.log("Autocomplete full text query results: ");
+	console.log("data: " + data);
+
+	var results = JSON.parse(data);
+	
+	console.log(results);
+	doneCallback( { suggestions: results } );
+
 }
 
 function starSuccess(data) {
@@ -541,7 +634,6 @@ function movie_page(movie_title, movie_director, movie_year, movie_genres, movie
 	movie_div.append(img).append(director).append(year).append(genres).append(stars);
 	$("body").append(title).append(details).append(img).append(movie_div);
 }
-
 
 function cartPage(title) {
 	console.log("CART PAGE");
