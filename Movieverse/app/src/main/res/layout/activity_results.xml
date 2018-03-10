@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.doomm.movieverse.ResultsActivity"
+    >
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:text="prev"
+        android:layout_marginTop="450dp"
+        android:id="@+id/prev"
+         />
+
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:text="next"
+        android:layout_marginTop="450dp"
+        android:layout_marginLeft="300dp"
+        android:id="@+id/next"
+ />
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/result_table"
+        >
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/display_row"
+             >
+            <TextView
+            android:layout_weight="1"
+                android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:text="Title"
+                android:textStyle="bold"
+            />
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:text="Year"
+                android:textStyle="bold"
+
+                />
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:text="Director"
+                android:textStyle="bold"
+
+                />
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:text="Genre"
+                android:textStyle="bold"
+
+                />
+            <TextView
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:text="Star"
+                android:textStyle="bold"
+
+                />
+
+        </TableRow>
+    </TableLayout>
+
+
+</RelativeLayout>

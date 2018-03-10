@@ -26,9 +26,15 @@ public class FullTextServlet extends HttpServlet {
 		
 		String title = request.getParameter("title");
 		String ajax = request.getParameter("ajax");
+		String android = "false";
+		try {
+			android = request.getParameter("android");
+		} catch(Exception e) {
+			System.out.println("android is null, set to false");
+		}
 		System.out.println("FULL TEXT SEARCH ON TITLE: " + title);
 		System.out.println("AUTOCOMPLETE: " + ajax);
-		
+		System.out.println("ANDROID: " + android);
 		String[] keywords = title.split("\\s");
 		
 		try {
@@ -148,23 +154,36 @@ public class FullTextServlet extends HttpServlet {
                         	responseObject = setAttribute(responseObject, "title", resultTitle, true);
                         	responseObject = setAttribute(responseObject, "year", resultYear, false);
                         	responseObject = setAttribute(responseObject, "director", resultDirector, false);
-                        	responseObject += ", \"genres\": {";
-                        	responseObject = setAttribute(responseObject, att, gen, true);
-                        	while(grs.next()) {
-                        		genreNum++;
-                        		responseObject = setAttribute(responseObject, "genre"+genreNum, grs.getString(1), false);
+                        	if (android.equals("true")) {
+                        		responseObject = setAttribute(responseObject, "genre", grs.getString(1), false);
+                        		grs.first();
+                        		
+                        		responseObject = setAttribute(responseObject, "star", srs.getString(1), false);
+                        		srs.first();
+                        		
+                        		System.out.println("ANDROID VERSION: " + responseObject);
+                        		responseObject += "}";
                         	}
-                        	
-//                        	close genres and open stars object
-                        	responseObject += "}, \"stars\": {";
-                        	responseObject = setAttribute(responseObject, "star" + starNum, srs.getString(1), true);
-                        	while(srs.next()) {
-                        		starNum++;
-                        		responseObject = setAttribute(responseObject, "star"+starNum, srs.getString(1), false);
+                        	else {
+                            	responseObject += ", \"genres\": {";
+                            	responseObject = setAttribute(responseObject, att, gen, true);
+                            	while(grs.next()) {
+                            		genreNum++;
+                            		responseObject = setAttribute(responseObject, "genre"+genreNum, grs.getString(1), false);
+                            	}
+                            	
+//                            	close genres and open stars object
+                            	responseObject += "}, \"stars\": {";
+                            	responseObject = setAttribute(responseObject, "star" + starNum, srs.getString(1), true);
+                            	while(srs.next()) {
+                            		starNum++;
+                            		responseObject = setAttribute(responseObject, "star"+starNum, srs.getString(1), false);
+                            	}
+                            	
+//                            	close stars and entire Movie object in JSON
+                            	responseObject += "} }";
                         	}
-                        	
-//                        	close stars and entire Movie object in JSON
-                        	responseObject += "} }";
+
                         	if(i == (keywords.length - 1) && rs.isLast()) {
                         		System.out.println("LAST ONE");
                         		
@@ -238,8 +257,10 @@ public class FullTextServlet extends HttpServlet {
           }  
         catch(java.lang.Exception ex)
         {
-            while (ex != null) {
-                System.out.println ("Exception:  " + ex.getMessage ());
+            if (ex != null) {
+                System.out.println ("Title:  " + title);
+                System.out.println("Ajax: " + ajax);
+                System.out.println("Android: " + android);
             }          
         }
 	}

@@ -31,11 +31,11 @@ public class LoginServlet extends HttpServlet {
 		System.out.println("LOGIN POST");
 
 
-		String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-		System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
-		boolean valid = VerifyUtils.verify(gRecaptchaResponse);
+//		String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+//		System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
+//		boolean valid = VerifyUtils.verify(gRecaptchaResponse);
 
-		
+
 		
 		// get the email and password sent from js form
 		String email =  request.getParameter("email");
@@ -79,15 +79,15 @@ public class LoginServlet extends HttpServlet {
             
             // result of query
             String responseObject = "{";
-    		if(!valid) {
-    			System.out.println("INVALID RECAPTCHA");
-    			responseObject = setAttribute(responseObject, "status", "failed", true);
-    			responseObject = setAttribute(responseObject, "message", "ReCaptcha failed", false);
-//    			responseObject += "}";
-//            	response.getWriter().write(responseObject);
-    		}
-    		else {
-    		System.out.println("VALID RECAPTCHA");
+//    		if(!valid) {
+//    			System.out.println("INVALID RECAPTCHA");
+//    			responseObject = setAttribute(responseObject, "status", "failed", true);
+//    			responseObject = setAttribute(responseObject, "message", "ReCaptcha failed", false);
+////    			responseObject += "}";
+////            	response.getWriter().write(responseObject);
+//    		}
+//    		else {
+    		System.out.println("HOLA MI AMIGOS: " + email + pass);
     		if (employee != null) {
     			System.out.println("employee confirmed");
                 query = "SELECT * FROM employees e WHERE e.email = \"" + email + "\"" + " and e.password=\"" + pass + "\";";
@@ -133,7 +133,7 @@ public class LoginServlet extends HttpServlet {
                 	responseObject = setAttribute(responseObject, "message", "No such username", false);
                 }
             }
-    		}
+//    		}
 
             
               

@@ -27,7 +27,7 @@ function submitBrowseForm(formSubmitEvent) {
 
 function submitMainSearch() {
 	console.log("Searching for title: " + $("#autocomplete").val());
-	jQuery.post("FullTextServlet", {"title": $("#autocomplete").val()}, searchSuccess);
+	jQuery.post("FullTextServlet", {"title": $("#autocomplete").val(), "ajax":"false", "android":"false"}, searchSuccess);
 }
 
 function postRequest (servlet, form, successFunction) {
@@ -78,7 +78,7 @@ function ajaxFunction(query, doneCallback) {
 
 			jQuery.ajax({
 				"method": "POST",
-				"url": "FullTextServlet?title=" + $("#autocomplete").val() + "&" + "ajax=true",
+				"url": "FullTextServlet?title=" + $("#autocomplete").val() + "&ajax=true&android=false",
 				"success":function(data) {
 					AutocompleteSuccess(data, query, doneCallback);
 				},

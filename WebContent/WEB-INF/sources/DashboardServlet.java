@@ -64,7 +64,7 @@ public class DashboardServlet extends HttpServlet {
 				"          <input id=\"login-button\" class=\"btn btn-primary my-3\" type=\"submit\" value=\"Login\">\r\n" + 
 				"      </div>\r\n" + 
 				"      <input class=\"employeeEmbed\" name=\"employee\" value=\"true\">\r\n" +
-				"      <div class=\"g-recaptcha\" data-sitekey=\"6LcM5UYUAAAAAMKJKTkGCU4QpAbjlLBPZk5PM8yG\"></div>\r\n" + 
+				"      <div class=\"g-recaptcha\" data-sitekey=\"6LeyBUoUAAAAAEJlJSXaI3hpXypMRI0m8j9xBBT5\"></div>\r\n" + 
 				"      \r\n" + 
 				"</form>");
 		out.println("<script type=\"text/javascript\" src=\"js/jquery-3.2.1.min.js\"></script>\r\n" + 
