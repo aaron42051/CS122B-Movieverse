@@ -7,11 +7,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.*;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 @WebServlet("/AddStarServlet")
 public class AddStarServlet extends HttpServlet {
@@ -50,9 +53,26 @@ public class AddStarServlet extends HttpServlet {
 		
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Context initCtx = new InitialContext();
+            if (initCtx == null)
+                System.out.println("initCtx is NULL");
+
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            if (envCtx == null)
+            	System.out.println("envCtx is NULL");
+
+            // Look up our data source
+            DataSource ds = (DataSource) envCtx.lookup("jdbc/TestDB");
+            
+            if (ds == null)
+            	System.out.println("ds is null.");
+
+            Connection connection = ds.getConnection();
+            if (connection == null)
+            	System.out.println("dbcon is null.");
+//			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
 			System.out.println("Connection valid: " + connection.isValid(10));
 			

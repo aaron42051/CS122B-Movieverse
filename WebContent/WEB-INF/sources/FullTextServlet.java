@@ -5,8 +5,9 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import javax.servlet.http.*;
-
-
+import javax.sql.DataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
@@ -38,15 +39,31 @@ public class FullTextServlet extends HttpServlet {
 		String[] keywords = title.split("\\s");
 		
 		try {
-			
+            Context initCtx = new InitialContext();
+            if (initCtx == null)
+                System.out.println("initCtx is NULL");
+
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            if (envCtx == null)
+            	System.out.println("envCtx is NULL");
+
+            // Look up our data source
+            DataSource ds = (DataSource) envCtx.lookup("jdbc/TestDB");
+            
+            if (ds == null)
+            	System.out.println("ds is null.");
+
+            Connection connection = ds.getConnection();
+            if (connection == null)
+            	System.out.println("dbcon is null.");
 			// establish new connection to MySQL
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
+//			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
 		   // AWS VERSION
 //	       Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 	        
 			// LOCAL VERSION
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
 			System.out.println("Connection valid: " + connection.isValid(10));
 			

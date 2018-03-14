@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.sql.*;
 
 import javax.servlet.http.*;
-
-
+import javax.sql.DataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
@@ -70,10 +71,27 @@ public class SearchServlet extends HttpServlet {
 		response.setContentType("text/html");
 
 		try {
-			
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Context initCtx = new InitialContext();
+            if (initCtx == null)
+                System.out.println("initCtx is NULL");
 
-			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            if (envCtx == null)
+            	System.out.println("envCtx is NULL");
+
+            // Look up our data source
+            DataSource ds = (DataSource) envCtx.lookup("jdbc/TestDB");
+            
+            if (ds == null)
+            	System.out.println("ds is null.");
+
+            Connection connection = ds.getConnection();
+            if (connection == null)
+            	System.out.println("dbcon is null.");
+			
+//			Class.forName("com.mysql.jdbc.Driver").newInstance();
+
+//			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 
             Statement statement = connection.createStatement();
