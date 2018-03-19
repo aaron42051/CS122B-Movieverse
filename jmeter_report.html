@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+   background-color: linen;
+}
+
+td {
+   border-top-style: solid;
+}
+</style>
+</head>
+<body>
+
+<table style="width:100%">
+ <tr style="font-weight:bold; background-color: orange">
+   <td width="300px">Single-instance version cases</td>
+   <td>Graph Results Screenshot</td>
+   <td>Average Query Time(ms)</td>
+   <td>Average Search Servlet Time(ms)</td>
+   <td>Average JDBC Time(ms)</td>
+   <td>Analysis</td>
+ </tr>
+ <tr>
+   <td>Case 1: HTTP/1 thread</td>
+   <td><img src="Graphs/Single/HTTP_1.png" alt="Graph Results Screenshot Case 1" style="width:304px;height:228px;"></td>
+   <td>93</td>
+   <td>0.94891</td>
+   <td>0.560471</td>
+   <td>Our basic case of using a single instance, 1 thread, and utilizing both connection pooling and prepared statements proves to work better than 10 threads without prepared statements.</td>
+ </tr>
+ <tr>
+   <td>Case 2: HTTP/10 threads</td>
+   <td><img src="Graphs/Single/HTTP_10.png" alt="Graph Results Screenshot Case 2" style="width:304px;height:228px;"></td>
+   <td>94</td>
+   <td>0.867435</td>
+   <td>0.481749</td>
+   <td>Having 10 threads query a single instance improves the overall performance slightly compared to just 1 thread.</td>
+ </tr>
+ <tr>
+   <td>Case 3: HTTPS/10 threads</td>
+   <td><img src="Graphs/Single/HTTPS_10.png" alt="Graph Results Screenshot Case 3" style="width:304px;height:228px;"></td>
+   <td>101</td>
+   <td>1.559915</td>
+   <td>0.995242</td>
+   <td>Overhead time spent encrypting data with HTTPS proves to slow performance by a good amount relative to HTTP.</td>
+ </tr>
+ <tr>
+   <td>Case 4: HTTP/10 threads/No prepared statements</td>
+   <td><img src="Graphs/Single/HTTP_NoPrep_10.png" alt="Graph Results Screenshot Case 4" style="width:304px;height:228px;"></td>
+   <td>94</td>
+   <td>0.569839</td>
+   <td>0.28616</td>
+   <td>No prepared statements for my application actually improved performance: may be due to lack of using prepared statement parameters (it constructs each query without prepared statements).</td>
+ </tr>
+ <tr>
+   <td>Case 5: HTTP/10 threads/No connection pooling</td>
+   <td><img src="Graphs/Single/HTTP_NoPool_10.png" alt="Graph Results Screenshot Case 4" style="width:304px;height:228px;"></td>
+   <td>97</td>
+   <td>3.466635</td>
+   <td>2.89547</td>
+   <td>The lack of connection pooling really hurts performance as 10 threads all opening and closing connections on 1 instance is very taxing.</td>
+ </tr>
+
+</table>
+
+
+<table style="width:100%">
+ <tr style="font-weight:bold; background-color: orange">
+   <td width="300px">Scaled version cases</td>
+   <td>Graph Results Screenshot</td>
+   <td>Average Query Time(ms)</td>
+   <td>Average Search Servlet Time(ms)</td>
+   <td>Average JDBC Time(ms)</td>
+   <td>Analysis</td>
+ </tr>
+ <tr>
+   <td>Case 1: HTTP/1 thread</td>
+   <td><img src="Graphs/Scaled/HTTP_1.png" alt="Graph Results Screenshot Case 1" style="width:304px;height:228px;"></td>
+   <td>94</td>
+   <td>0.81915</td>
+   <td>0.450825</td>
+   <td>HTTP 1 thread with load balancing has a slight improvement over single instance as the workload is distributed among a master and slave.</td>
+ </tr>
+ <tr>
+   <td>Case 2: HTTP/10 threads</td>
+   <td><img src="Graphs/Scaled/HTTP_10.png" alt="Graph Results Screenshot Case 2" style="width:304px;height:228px;"></td>
+   <td>96</td>
+   <td>0.994802</td>
+   <td>0.575566</td>
+   <td>The use of more threads with additional instances slightly hurts the performance; being required to constantly load balance 10 threads may be hard to manage.</td>
+ </tr>
+ <tr>
+   <td>Case 3: HTTP/10 threads/No prepared statements</td>
+   <td><img src="Graphs/Scaled/HTTP_NoPrep_10.png" alt="Graph Results Screenshot Case 4" style="width:304px;height:228px;"></td>
+   <td>94</td>
+   <td>0.569007</td>
+   <td>0.299127</td>
+   <td>Again, no prepared statements is improving performance, maybe due to the lack of using the prepared statement parameters</td>
+ </tr>
+ <tr>
+   <td>Case 4: HTTP/10 threads/No connection pooling</td>
+   <td><img src="Graphs/Scaled/HTTP_NoPool_10.png" alt="Graph Results Screenshot Case 4" style="width:304px;height:228px;"></td>
+   <td>95</td>
+   <td>1.578953</td>
+   <td>1.255721</td>
+   <td>The lack of pooling again affects the overall performance but having 2 additional instances to open their own connections assists with this greatly compared to having a single isntance.</td>
+ </tr>
+
+</table>
+
+</body>
+</html>

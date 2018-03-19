@@ -51,7 +51,8 @@ public class MetadataServlet extends HttpServlet {
             if (connection == null)
             	System.out.println("dbcon is null.");
 			
-			
+            Statement statement = connection.createStatement();
+
 			// establish new connection to MySQL
 //			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
@@ -60,10 +61,7 @@ public class MetadataServlet extends HttpServlet {
 	        
 			// LOCAL VERSION
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
-
-			System.out.println("Connection valid: " + connection.isValid(10));
 			
-            Statement statement = connection.createStatement();
 
             // write query
             
@@ -98,6 +96,8 @@ public class MetadataServlet extends HttpServlet {
             		responseObject += ", ";
             	}
             }
+        	connection.close();
+
             responseObject += "}";
         	response.getWriter().write(responseObject);
 

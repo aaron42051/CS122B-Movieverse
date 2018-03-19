@@ -49,7 +49,8 @@ public class BrowseServlet extends HttpServlet {
             Connection connection = ds.getConnection();
             if (connection == null)
             	System.out.println("dbcon is null.");
-			
+            Statement statement = connection.createStatement();
+
 			// establish new connection to MySQL
 //			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
@@ -59,9 +60,7 @@ public class BrowseServlet extends HttpServlet {
 			// LOCAL VERSION
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
-			System.out.println("Connection valid: " + connection.isValid(10));
 			
-            Statement statement = connection.createStatement();
             
             // AWS VERSION
 //          String useDB = "use moviedb;";
@@ -85,7 +84,8 @@ public class BrowseServlet extends HttpServlet {
             	num++;
             }
             responseObject += "}";
-            
+        	connection.close();
+
         	response.getWriter().write(responseObject);
 
 		}

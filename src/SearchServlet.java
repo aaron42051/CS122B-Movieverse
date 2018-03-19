@@ -1,5 +1,8 @@
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 
@@ -26,37 +29,35 @@ public class SearchServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("SEARCH 1");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
-		System.out.println("SEARCH GET");
+		long serveStart = System.nanoTime();
+		long endTime = 0;
 		
 		String title = request.getParameter("movie-title");
 		
+		System.out.println("TITLE: " + title);
 		
 
 		int year = 0;
+		
+		long jdbcStart = System.nanoTime();
+
 		try {
 			year = Integer.parseInt(request.getParameter("movie-year"));
 		}
 				
 		catch(NumberFormatException ex) {
-			System.out.println("Not a numerical year!");
+			//System.out.println("Not a numerical year!");
 		}
 		
-		System.out.println("year: " + year);
+//		System.out.println("year: " + year);
 
 		String director = request.getParameter("movie-director");
 		
-		System.out.println("director: " + director);
+//		System.out.println("director: " + director);
 		
 		String star = request.getParameter("movie-stars");
 		
-		System.out.println("star: " + star);
+//		System.out.println("star: " + star);
 		
 		System.out.println();
 		
@@ -66,7 +67,7 @@ public class SearchServlet extends HttpServlet {
 		
 		String browse = request.getParameter("browse");
 
-
+		Connection connection = null;
 		
 		response.setContentType("text/html");
 
@@ -85,24 +86,32 @@ public class SearchServlet extends HttpServlet {
             if (ds == null)
             	System.out.println("ds is null.");
 
-            Connection connection = ds.getConnection();
+            connection = ds.getConnection();
             if (connection == null)
             	System.out.println("dbcon is null.");
 			
-//			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
 
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","ajching", "ajching");
 
-            Statement statement = connection.createStatement();
+//            Statement statement = connection.createStatement();
             
-            // AWS VERSION
-//          String useDB = "use moviedb;";
-          
+            
+            
             // LOCAL VERSION
             String useDB = "use cs122b;";
+//            statement.execute(useDB);
+
             
-            statement.execute(useDB);
+            // PREP
+            connection.setAutoCommit(false);
+            PreparedStatement pstatement;
+
+            pstatement = connection.prepareStatement(useDB);
+            pstatement.execute();
+            
+            
             
             String baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m WHERE ";
             
@@ -113,7 +122,6 @@ public class SearchServlet extends HttpServlet {
             	baseQuery = "SELECT m.id, m.title, m.year, m.director FROM movies m, stars s, stars_in_movies sm WHERE m.id = sm.movieId AND s.id = sm.starId AND s.name LIKE \"%" + star + "%\" ";
             }
             if (title != null && title != "") {
-            	System.out.println("!");
             	if(!first) {
             		baseQuery += " AND ";
             	}
@@ -147,12 +155,19 @@ public class SearchServlet extends HttpServlet {
         	if(genre != null) {
         		baseQuery = "SELECT m.id, m.title, m.year, m.director FROM genres g, movies m, genres_in_movies gm WHERE g.id = gm.genreId AND m.id = gm.movieId AND g.name =\"" + genre + "\";";
         	}
+        	
         	System.out.println("CONSTRUCTED: ");
             System.out.println(baseQuery);
-            ResultSet rs = statement.executeQuery(baseQuery);
             
-            System.out.println("EXECUTING...");
+            pstatement = connection.prepareStatement(baseQuery);
+            ResultSet rs = pstatement.executeQuery();
+//            connection.commit();
 
+//            ResultSet rs = statement.executeQuery(baseQuery);
+        	endTime = System.nanoTime();
+
+
+        	
 //          open up new JSON
             String responseObject = "{";
             
@@ -175,8 +190,12 @@ public class SearchServlet extends HttpServlet {
             	responseObject += ", \"genres\": {";
             	
             	String genreQuery = "SELECT g.name FROM genres g, movies m, genres_in_movies gm WHERE g.id = gm.genreId AND m.id = gm.movieId AND m.id = \"" + resultID + "\"";
-                Statement gstatement = connection.createStatement();
-            	ResultSet grs = gstatement.executeQuery(genreQuery);
+                
+            	pstatement = connection.prepareStatement(genreQuery);
+                ResultSet grs = pstatement.executeQuery();
+            	
+//            	Statement gstatement = connection.createStatement();
+//            	ResultSet grs = gstatement.executeQuery(genreQuery);
             	int genreNum = 1;
             	
             	String att = "genre" + Integer.toString(genreNum);
@@ -194,9 +213,12 @@ public class SearchServlet extends HttpServlet {
             	responseObject += "}, \"stars\": {";
             	
             	String starQuery = "SELECT s.name FROM stars s, movies m, stars_in_movies sm WHERE s.id = sm.starId AND m.id = sm.movieId AND m.id = \"" + resultID + "\"";
-                Statement sstatement = connection.createStatement();
-   	
-            	ResultSet srs = sstatement.executeQuery(starQuery);
+            	// PREP
+                pstatement = connection.prepareStatement(starQuery);
+                ResultSet srs = pstatement.executeQuery();
+                
+//                Statement sstatement = connection.createStatement();
+//            	ResultSet srs = sstatement.executeQuery(starQuery);
             	int starNum = 1;
             	srs.next();
             	responseObject = setAttribute(responseObject, "star" + starNum, srs.getString(1), true);
@@ -216,13 +238,48 @@ public class SearchServlet extends HttpServlet {
             
 //          close entire JSON response
             responseObject += "}";
+            long serveEnd = System.nanoTime();
+            long elapsedServlet = serveEnd - serveStart;
+            long elapsedJDBC = endTime - jdbcStart;
             
+            File servlet_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_servlet_log.txt");
+            File jdbc_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_jdbc_log.txt");
+            
+            if (!servlet_log.exists()) {
+            	System.out.println("CREATING NEW FILE S");
+            	servlet_log.createNewFile();
+            }
+            if(!jdbc_log.exists()) {
+            	System.out.println("CREATING NEW FILE J");
+            	jdbc_log.createNewFile();
+            }
+            
+            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
+            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
+            
+            BufferedWriter out = new BufferedWriter(fw);
+            BufferedWriter out2 = new BufferedWriter(fw2);
+            
+            
+            out.write(String.valueOf(elapsedServlet) + "\n");
+            out2.write(String.valueOf(elapsedJDBC) + "\n");
+            
+
+        	
+            out.flush();
+            out2.flush();
+            
+        	out.close();
+        	out2.close();
         	response.getWriter().write(responseObject);
+        	connection.setAutoCommit(true);
+        	connection.close();
 
 		}
         catch (SQLException ex) {
             while (ex != null) {
                   System.out.println ("SQL Exception:  " + ex.getMessage ());
+
                   ex = ex.getNextException ();
               }  
           }  

@@ -1,5 +1,8 @@
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -24,7 +27,9 @@ public class FullTextServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		long serveStart = System.nanoTime();
+		long endTime = 0;
+
 		String title = request.getParameter("title");
 		String ajax = request.getParameter("ajax");
 		String android = "false";
@@ -37,6 +42,9 @@ public class FullTextServlet extends HttpServlet {
 		System.out.println("AUTOCOMPLETE: " + ajax);
 		System.out.println("ANDROID: " + android);
 		String[] keywords = title.split("\\s");
+		
+
+		long jdbcStart = System.nanoTime();
 		
 		try {
             Context initCtx = new InitialContext();
@@ -56,6 +64,10 @@ public class FullTextServlet extends HttpServlet {
             Connection connection = ds.getConnection();
             if (connection == null)
             	System.out.println("dbcon is null.");
+            
+            Statement statement = connection.createStatement();
+
+            
 			// establish new connection to MySQL
 //			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
@@ -65,9 +77,7 @@ public class FullTextServlet extends HttpServlet {
 			// LOCAL VERSION
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
-			System.out.println("Connection valid: " + connection.isValid(10));
 			
-            Statement statement = connection.createStatement();
             Statement starstatement = connection.createStatement();
             
             String useDB = "use cs122b;";
@@ -90,7 +100,7 @@ public class FullTextServlet extends HttpServlet {
             String starBaseQuery = "SELECT s.id, s.name FROM stars s WHERE ";
             for(int i = 0; i < keywords.length; i++) {
             	ResultSet rs = statement.executeQuery(baseQuery + "MATCH (title) AGAINST ('"+ keywords[i] + "*' IN BOOLEAN MODE);");
-            	
+            	endTime = System.nanoTime();
             	if (ajax.equals("true")) {
                 	ResultSet starsRS = starstatement.executeQuery(starBaseQuery + "MATCH (name) AGAINST ('"+ keywords[i] + "*' IN BOOLEAN MODE);");
         			while(starsRS.next()) {
@@ -262,7 +272,42 @@ public class FullTextServlet extends HttpServlet {
             else {
                 responseObject += "}";
             }
+            long serveEnd = System.nanoTime();
+            long elapsedServlet = serveEnd - serveStart;
+            long elapsedJDBC = endTime - jdbcStart;
             
+            File servlet_log = new File("/home/ubuntu/tomcat/logs/servlet_log.txt");
+            File jdbc_log = new File("/home/ubuntu/tomcat/logs/jdbc_log.txt");
+            
+            if (!servlet_log.exists()) {
+            	System.out.println("CREATING NEW FILE S");
+            	servlet_log.createNewFile();
+            }
+            if(!jdbc_log.exists()) {
+            	System.out.println("CREATING NEW FILE J");
+            	jdbc_log.createNewFile();
+            }
+            
+            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
+            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
+            
+            BufferedWriter out = new BufferedWriter(fw);
+            BufferedWriter out2 = new BufferedWriter(fw2);
+            
+            
+            out.write(String.valueOf(elapsedServlet));
+            out2.write(String.valueOf(elapsedJDBC));
+            
+            System.out.println(elapsedServlet);
+            System.out.println(elapsedJDBC);
+        	
+            out.flush();
+            out2.flush();
+            
+        	out.close();
+        	out2.close();
+        	connection.close();
+
         	response.getWriter().write(responseObject);
             
 		}

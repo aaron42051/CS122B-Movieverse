@@ -5,6 +5,8 @@ sort = "";
 titleSort = 1;
 yearSort = 1;
 shopping_cart = {};
+search_cache = {};
+current_search = "";
 
 // LOGIN FORM
 
@@ -27,7 +29,7 @@ function submitBrowseForm(formSubmitEvent) {
 
 function submitMainSearch() {
 	console.log("Searching for title: " + $("#autocomplete").val());
-	jQuery.post("FullTextServlet", {"title": $("#autocomplete").val(), "ajax":"false", "android":"false"}, searchSuccess);
+	jQuery.post("FullTextServlet", {"title": "war", "ajax": "false", "android": "false"}, searchSuccess);
 }
 
 function postRequest (servlet, form, successFunction) {
@@ -72,21 +74,27 @@ function ajaxFunction(query, doneCallback) {
 			}
 		}
 	}
-
+	current_search = $("#autocomplete").val();
 		if($("#autocomplete").val().length > 2){
-			console.log("3 confirmed, initiate autocomplete");
-
-			jQuery.ajax({
-				"method": "POST",
-				"url": "FullTextServlet?title=" + $("#autocomplete").val() + "&ajax=true&android=false",
-				"success":function(data) {
-					AutocompleteSuccess(data, query, doneCallback);
-				},
-				"error": function(errorData) {
-					console.log("lookup ajax error");
-					console.log(errorData);
-				}
-			});
+			console.log("3 confirmed");
+			if ((current_search in search_cache)){
+				console.log("Search in cache, returning cached result");
+				doneCallback( { suggestions: search_cache[current_search] } );
+			}
+			else {
+				console.log("Search not cached, making AJAX request");
+				jQuery.ajax({
+					"method": "POST",
+					"url": "FullTextServlet?title=" + $("#autocomplete").val() + "&ajax=true&android=false",
+					"success":function(data) {
+						AutocompleteSuccess(data, query, doneCallback);
+					},
+					"error": function(errorData) {
+						console.log("lookup ajax error");
+						console.log(errorData);
+					}
+				});
+			}
 	}
 }
 
@@ -505,11 +513,10 @@ function star_page(star) {
 }
 
 function AutocompleteSuccess(data, query, doneCallback) {
+	console.log();
 	console.log("Autocomplete full text query results: ");
-	console.log("data: " + data);
-
 	var results = JSON.parse(data);
-	
+	search_cache[current_search] = results;
 	console.log(results);
 	doneCallback( { suggestions: results } );
 

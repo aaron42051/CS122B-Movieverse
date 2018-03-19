@@ -1,6 +1,9 @@
 
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 
 import javax.servlet.http.*;
@@ -28,7 +31,7 @@ public class LoginServlet extends HttpServlet {
 
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		
 		System.out.println("LOGIN POST");
 
 
@@ -49,12 +52,14 @@ public class LoginServlet extends HttpServlet {
 	
 		response.setContentType("text/html");
 
+		
+		
 		try {
+			
 			
             Context initCtx = new InitialContext();
             if (initCtx == null)
                 System.out.println("initCtx is NULL");
-
             Context envCtx = (Context) initCtx.lookup("java:comp/env");
             if (envCtx == null)
             	System.out.println("envCtx is NULL");
@@ -68,6 +73,9 @@ public class LoginServlet extends HttpServlet {
             Connection connection = ds.getConnection();
             if (connection == null)
             	System.out.println("dbcon is null.");
+            
+            Statement statement = connection.createStatement();
+
 			
 			// establish new connection to MySQL
 //			Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -78,9 +86,7 @@ public class LoginServlet extends HttpServlet {
 			// LOCAL VERSION
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
 
-			System.out.println("Connection valid: " + connection.isValid(10));
 			
-            Statement statement = connection.createStatement();
 
             connection.setAutoCommit(false);
             PreparedStatement pstatement;
@@ -160,13 +166,14 @@ public class LoginServlet extends HttpServlet {
                 	responseObject = setAttribute(responseObject, "message", "No such username", false);
                 }
             }
-//    		}
-
             
-              
+
+        	connection.close();
+
             responseObject += " }";
             System.out.println(responseObject);
         	response.getWriter().write(responseObject);
+
 
 		}
         catch (SQLException ex) {
@@ -181,6 +188,8 @@ public class LoginServlet extends HttpServlet {
                 System.out.println ("Exception:  " + ex.getMessage ());
             }          
         }
+		
+		
 	}
 	
 	public String setAttribute(String json, String attribute, String value, boolean first) {

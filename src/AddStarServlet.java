@@ -1,10 +1,6 @@
 
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.*;
 
 import javax.naming.Context;
@@ -70,38 +66,54 @@ public class AddStarServlet extends HttpServlet {
             Connection connection = ds.getConnection();
             if (connection == null)
             	System.out.println("dbcon is null.");
+            
+//            Statement statement = connection.createStatement();
+
 //			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
 //			Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
-
-			System.out.println("Connection valid: " + connection.isValid(10));
 			
-            Statement statement = connection.createStatement();
             
             String useDB = "use cs122b;";
 
             String query = "SELECT s.name FROM stars s WHERE s.name = \"" + name + "\" and s.birthYear = \"" + year + "\";";
             String getID = "SELECT * FROM maxID WHERE id = 1;";
 
-            statement.execute(useDB);
+//            statement.execute(useDB);
+            
+            connection.setAutoCommit(false);
+            PreparedStatement pstatement;
+            pstatement = connection.prepareStatement(useDB);
+            pstatement.execute();
             
             System.out.println("CHECK STAR: " + query);
             System.out.println("GET ID: " + getID);
             
-            ResultSet rs = statement.executeQuery(query);
+//            ResultSet rs = statement.executeQuery(query);
+            pstatement = connection.prepareStatement(query);
+            ResultSet rs = pstatement.executeQuery();
             
             if (rs.next()) {
             	response.getWriter().write("{\"status\":\"failed\", \"message\":\"Already in database\"}");
             }
             else {
-            	
-            	ResultSet rs2  = statement.executeQuery(getID);
+                pstatement = connection.prepareStatement(getID);
+                ResultSet rs2 = pstatement.executeQuery();
+//            	ResultSet rs2  = statement.executeQuery(getID);
             	rs2.next();
             	int id = rs2.getInt(2) + 1;
             	
-            	statement.execute("INSERT INTO stars VALUES(\"" + "nm" + id + "\", \"" + name +"\", \"" + year +"\");");
-            	statement.execute("UPDATE maxID SET maxID = maxID + 1 WHERE id = 1;");
+                pstatement = connection.prepareStatement("INSERT INTO stars VALUES(\"" + "nm" + id + "\", \"" + name +"\", \"" + year +"\");");
+                pstatement.execute();
+                pstatement = connection.prepareStatement("UPDATE maxID SET maxID = maxID + 1 WHERE id = 1;");
+                pstatement.execute();
+//            	statement.execute("INSERT INTO stars VALUES(\"" + "nm" + id + "\", \"" + name +"\", \"" + year +"\");");
+//            	statement.execute("UPDATE maxID SET maxID = maxID + 1 WHERE id = 1;");
             	
+                connection.setAutoCommit(true);
+                connection.commit();
+            	connection.close();
+
             	response.getWriter().write("{\"status\":\"success\", \"message\": \"New star named " + name + " has been added with id nm" + id +"!\"}");
             }
 

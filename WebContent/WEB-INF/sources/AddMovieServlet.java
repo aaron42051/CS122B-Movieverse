@@ -1,8 +1,4 @@
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.*;
 
 import javax.naming.Context;
@@ -42,6 +38,7 @@ public class AddMovieServlet extends HttpServlet {
 			response.getWriter().write("{\"status\": \"failed\", \"message\": \"Must fill in all inputs correctly!\"}");
 		}
 		else {
+
 			try {
 	            Context initCtx = new InitialContext();
 	            if (initCtx == null)
@@ -60,23 +57,33 @@ public class AddMovieServlet extends HttpServlet {
 	            Connection connection = ds.getConnection();
 	            if (connection == null)
 	            	System.out.println("dbcon is null.");
-				
+	            
+//	            Statement statement = connection.createStatement();
+
 				
 				
 //				Class.forName("com.mysql.jdbc.Driver").newInstance();
 				
 //				Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306?autoReconnect=true&useSSL=false","root", "Username42051");
-
-				System.out.println("Connection valid: " + connection.isValid(10));
-				
-	            Statement statement = connection.createStatement();
+	            
+	            connection.setAutoCommit(false);
+	            PreparedStatement pstatement;
 	            
 	            String useDB = "use cs122b;";
+//	            statement.execute(useDB);
+	            pstatement = connection.prepareStatement(useDB);
+	            pstatement.execute();
 	            
-	            statement.execute(useDB);
 	            
 	            String query = "CALL add_movie(\"" + title + "\", " + Integer.parseInt(year) + ", \"" + director + "\", \"" + genre + "\", \"" + star + "\", " + Integer.parseInt(birthYear) + ");";
-	            statement.execute(query);
+//	            statement.execute(query);
+	            pstatement = connection.prepareStatement(query);
+	            pstatement.execute();
+	            
+	            connection.setAutoCommit(true);
+	            connection.commit();
+	        	connection.close();
+
 	            response.getWriter().write("{\"status\": \"success\", \"message\":\"Adding " + title + " was a success!\"}");
 			}
 			catch (SQLException ex) {
