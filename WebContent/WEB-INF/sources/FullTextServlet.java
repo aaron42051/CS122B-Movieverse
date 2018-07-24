@@ -272,40 +272,41 @@ public class FullTextServlet extends HttpServlet {
             else {
                 responseObject += "}";
             }
-            long serveEnd = System.nanoTime();
-            long elapsedServlet = serveEnd - serveStart;
-            long elapsedJDBC = endTime - jdbcStart;
+//            long serveEnd = System.nanoTime();
+//            long elapsedServlet = serveEnd - serveStart;
+//            long elapsedJDBC = endTime - jdbcStart;
+//            
+//            File servlet_log = new File("/home/ubuntu/tomcat/logs/servlet_log.txt");
+//            File jdbc_log = new File("/home/ubuntu/tomcat/logs/jdbc_log.txt");
             
-            File servlet_log = new File("/home/ubuntu/tomcat/logs/servlet_log.txt");
-            File jdbc_log = new File("/home/ubuntu/tomcat/logs/jdbc_log.txt");
+//            if (!servlet_log.exists()) {
+//            	System.out.println("CREATING NEW FILE S");
+//            	servlet_log.createNewFile();
+//            }
+//            if(!jdbc_log.exists()) {
+//            	System.out.println("CREATING NEW FILE J");
+//            	jdbc_log.createNewFile();
+//            }
             
-            if (!servlet_log.exists()) {
-            	System.out.println("CREATING NEW FILE S");
-            	servlet_log.createNewFile();
-            }
-            if(!jdbc_log.exists()) {
-            	System.out.println("CREATING NEW FILE J");
-            	jdbc_log.createNewFile();
-            }
-            
-            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
-            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
-            
-            BufferedWriter out = new BufferedWriter(fw);
-            BufferedWriter out2 = new BufferedWriter(fw2);
-            
-            
-            out.write(String.valueOf(elapsedServlet));
-            out2.write(String.valueOf(elapsedJDBC));
-            
-            System.out.println(elapsedServlet);
-            System.out.println(elapsedJDBC);
-        	
-            out.flush();
-            out2.flush();
-            
-        	out.close();
-        	out2.close();
+//            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
+//            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
+//            
+//            BufferedWriter out = new BufferedWriter(fw);
+//            BufferedWriter out2 = new BufferedWriter(fw2);
+//            
+//            
+//            out.write(String.valueOf(elapsedServlet));
+//            out2.write(String.valueOf(elapsedJDBC));
+//            
+//            System.out.println(elapsedServlet);
+//            System.out.println(elapsedJDBC);
+//        	
+//            out.flush();
+//            out2.flush();
+//            
+//        	out.close();
+//        	out2.close();
+            System.out.println("RESPONSE OBJECT: " +responseObject);
         	connection.close();
 
         	response.getWriter().write(responseObject);
@@ -320,9 +321,11 @@ public class FullTextServlet extends HttpServlet {
         catch(java.lang.Exception ex)
         {
             if (ex != null) {
+            	System.out.println();
                 System.out.println ("Title:  " + title);
                 System.out.println("Ajax: " + ajax);
                 System.out.println("Android: " + android);
+                System.out.println(ex);
             }          
         }
 	}

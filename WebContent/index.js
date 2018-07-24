@@ -29,7 +29,7 @@ function submitBrowseForm(formSubmitEvent) {
 
 function submitMainSearch() {
 	console.log("Searching for title: " + $("#autocomplete").val());
-	jQuery.post("FullTextServlet", {"title": "war", "ajax": "false", "android": "false"}, searchSuccess);
+	jQuery.post("FullTextServlet", {"title": $("#autocomplete").val(), "ajax": "false", "android": "false"}, searchSuccess);
 }
 
 function postRequest (servlet, form, successFunction) {

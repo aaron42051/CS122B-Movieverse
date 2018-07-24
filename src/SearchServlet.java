@@ -164,7 +164,7 @@ public class SearchServlet extends HttpServlet {
 //            connection.commit();
 
 //            ResultSet rs = statement.executeQuery(baseQuery);
-        	endTime = System.nanoTime();
+//        	endTime = System.nanoTime();
 
 
         	
@@ -238,39 +238,39 @@ public class SearchServlet extends HttpServlet {
             
 //          close entire JSON response
             responseObject += "}";
-            long serveEnd = System.nanoTime();
-            long elapsedServlet = serveEnd - serveStart;
-            long elapsedJDBC = endTime - jdbcStart;
+//            long serveEnd = System.nanoTime();
+//            long elapsedServlet = serveEnd - serveStart;
+//            long elapsedJDBC = endTime - jdbcStart;
             
-            File servlet_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_servlet_log.txt");
-            File jdbc_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_jdbc_log.txt");
-            
-            if (!servlet_log.exists()) {
-            	System.out.println("CREATING NEW FILE S");
-            	servlet_log.createNewFile();
-            }
-            if(!jdbc_log.exists()) {
-            	System.out.println("CREATING NEW FILE J");
-            	jdbc_log.createNewFile();
-            }
-            
-            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
-            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
-            
-            BufferedWriter out = new BufferedWriter(fw);
-            BufferedWriter out2 = new BufferedWriter(fw2);
-            
-            
-            out.write(String.valueOf(elapsedServlet) + "\n");
-            out2.write(String.valueOf(elapsedJDBC) + "\n");
-            
-
-        	
-            out.flush();
-            out2.flush();
-            
-        	out.close();
-        	out2.close();
+//            File servlet_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_servlet_log.txt");
+//            File jdbc_log = new File("/home/ubuntu/tomcat/logs/HTTPS_10_jdbc_log.txt");
+//            
+//            if (!servlet_log.exists()) {
+//            	System.out.println("CREATING NEW FILE S");
+//            	servlet_log.createNewFile();
+//            }
+//            if(!jdbc_log.exists()) {
+//            	System.out.println("CREATING NEW FILE J");
+//            	jdbc_log.createNewFile();
+//            }
+//            
+//            FileWriter fw = new FileWriter(servlet_log.getAbsolutePath(), true);
+//            FileWriter fw2 = new FileWriter(jdbc_log.getAbsolutePath(), true);
+//            
+//            BufferedWriter out = new BufferedWriter(fw);
+//            BufferedWriter out2 = new BufferedWriter(fw2);
+//            
+//            
+//            out.write(String.valueOf(elapsedServlet) + "\n");
+//            out2.write(String.valueOf(elapsedJDBC) + "\n");
+//            
+//
+//        	
+//            out.flush();
+//            out2.flush();
+//            
+//        	out.close();
+//        	out2.close();
         	response.getWriter().write(responseObject);
         	connection.setAutoCommit(true);
         	connection.close();

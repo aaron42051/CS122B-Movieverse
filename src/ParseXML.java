@@ -23,7 +23,6 @@ import java.util.*;
 
 
 
-import org.apache.juli.logging.*;
 
 public class ParseXML {
 	Document dom;
